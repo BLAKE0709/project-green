@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Project Green</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 680px; margin: 2rem auto; }
+      input, button { padding: .5rem; margin: .25rem 0; width: 100%; }
+      .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Project Green</h1>
+    <p class="card">
+      Publish a tiny landing page and fetch it via REST.
+    </p>
+
+    <form id="publish" class="card">
+      <input id="title" placeholder="Title" required />
+      <input id="desc" placeholder="Description" required />
+      <button type="submit">Publish</button>
+    </form>
+
+    <pre id="out"></pre>
+
+    <script src="script.js"></script>
+  </body>
+</html>
