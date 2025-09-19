@@ -4,9 +4,35 @@ const path = require('path');
 
 // In-memory store of published pages
 const pages = {};
+const userData = {
+  scenes: [
+    { id: 1, title: 'Idea Scout', description: 'Pick your business idea', completed: false },
+    { id: 2, title: 'MVP Builder', description: 'Build your MVP landing page', completed: false },
+    { id: 3, title: 'Sales Sprint', description: 'Outreach to validate your idea', completed: false },
+  ],
+  xp: 0,
+  streak: 0,
+  lastCompletionDate: null
+};
+
+// Award XP and update streak
+function awardXP(points) {
+  userData.xp += points;
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  if (userData.lastCompletionDate === today) {
+    // already awarded today, keep streak as is
+  } else if (userData.lastCompletionDate === yesterday) {
+    userData.streak += 1;
+  } else {
+    userData.streak = 1;
+  }
+  userData.lastCompletionDate = today;
+}
+
 
 // --- API HANDLERS -----------------------------------------------------------
-function handleAPI(req, res) {
+fnction handleAPI(req, res) {
   const url = new URL(req.url, 'http://localhost');
 
   // Health check
@@ -16,7 +42,31 @@ function handleAPI(req, res) {
       status: 'healthy',
       service: 'project-green',
       timestamp: new Date().toISOString()
-    }));
+    
+      // Scenes: get list and stats
+  if (url.pathname === '/api/scenes' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify(userData));
+  }
+
+  // Scenes: mark scene completed
+  if (url.pathname.startsWith('/api/scenes/') && req.method === 'POST') {
+    const id = parseInt(url.pathname.split('/').pop());
+
+//// sconst scene = userData.scenes.find(s => s.id === id);
+//cene = userData.scenes.find(s => s.id === id);
+        const scene = userData.scenes.find(s => s.id === id);
+
+    if (scene && !scene.completed) {
+      scene.completed = true;
+      awardXP(10);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ success: true, userData }));
+    }
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ error: 'Invalid scene id or already completed' }));
+  }
+}));
   }
 
   // Publish a landing page: POST /api/landing/publish { title, description, slug? }
